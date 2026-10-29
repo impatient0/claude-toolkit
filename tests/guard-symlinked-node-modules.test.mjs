@@ -29,6 +29,15 @@ const DENY = [
   ['inside bash -c', 'bash -c "npm ci"'],
   ['inside eval', 'eval "npm install"'],
   ['inside a command substitution', 'echo "$(npm ci)"'],
+  ['pnpm install', 'pnpm install'],
+  ['pnpm i', 'pnpm i --frozen-lockfile'],
+  ['pnpm add', 'pnpm add zod'],
+  ['yarn install', 'yarn install --immutable'],
+  ['yarn add', 'yarn add zod'],
+  ['bare yarn (runs install)', 'yarn'],
+  ['bun install', 'bun install'],
+  ['bun i', 'bun i'],
+  ['bun add', 'bun add zod'],
 ];
 
 const ALLOW = [
@@ -39,6 +48,12 @@ const ALLOW = [
   ['npm view', 'npm view fastify version'],
   ['a global install', 'npm install -g npm@12'],
   ['a global install, long flag', 'npm install --global npm@12'],
+  ['pnpm test', 'pnpm test'],
+  ['pnpm add -g', 'pnpm add -g typescript'],
+  ['yarn test', 'yarn test'],
+  ['yarn global add', 'yarn global add typescript'],
+  ['bun test', 'bun test'],
+  ['bun add -g', 'bun add -g typescript'],
   ['echo mentioning npm ci', 'echo npm ci'],
   ['grep for npm ci', 'grep -rn "npm ci" docs/'],
   ['a commit message quoting it', 'git commit -m "docs: npm ci empties the shared node_modules"'],
@@ -70,10 +85,13 @@ test('allows npm ci once node_modules is a real directory, or absent', () => {
   assert.equal(decide('npm install', WORKTREE, real), null);
 });
 
-test('follows --prefix and -C to the directory npm will act on', () => {
+test('follows --prefix, -C, --dir, and --cwd to the directory the package manager will act on', () => {
   assert.match(decide(`npm ci --prefix ${OTHER}`, WORKTREE, linkedOnlyInOther), /symlink/);
   assert.match(decide(`npm --prefix=${OTHER} install`, WORKTREE, linkedOnlyInOther), /symlink/);
   assert.match(decide(`npm -C ${OTHER} ci`, WORKTREE, linkedOnlyInOther), /symlink/);
+  assert.match(decide(`pnpm --dir ${OTHER} install`, WORKTREE, linkedOnlyInOther), /symlink/);
+  assert.match(decide(`yarn --cwd ${OTHER} install`, WORKTREE, linkedOnlyInOther), /symlink/);
+  assert.match(decide(`bun --cwd=${OTHER} install`, WORKTREE, linkedOnlyInOther), /symlink/);
   assert.equal(decide(`npm ci --prefix ${MAIN}`, WORKTREE, linkedOnlyInOther), null);
   assert.equal(decide('npm ci', WORKTREE, linkedOnlyInOther), null);
 });

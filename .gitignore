@@ -1,4 +1,4 @@
-node_modules/
+node_modules
 .claude/worktrees/
 .claude/settings.local.json
 .claude/RESUME.md
