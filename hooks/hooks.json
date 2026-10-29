@@ -1,0 +1,29 @@
+{
+  "description": "PreToolUse guards for remote mutations, main-checkout edits, and shared node_modules symlinks",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/.claude/hooks/guard-remote-mutation.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/.claude/hooks/guard-symlinked-node-modules.mjs\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/.claude/hooks/guard-main-checkout-edits.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -14,7 +14,25 @@ Where a default convention is opinionated (such as running every session in its 
 
 ## Quick Start
 
-### Option A: Bootstrap a Repository (Self-Contained in Git)
+### Option A: Install as a Native Claude Code Plugin
+
+Register the repository via Claude Code's `/plugin` command to load all seven skills and the `PreToolUse` guards (`hooks/hooks.json`) without committing toolkit files into your project repository:
+
+```text
+/plugin marketplace add impatient0/claude-toolkit
+/plugin install claude-toolkit@claude-toolkit
+```
+
+Or load a local clone directly for a single session:
+
+```bash
+claude --plugin-dir /path/to/claude-toolkit
+```
+
+The native plugin provides the 7 skills and the 3 `PreToolUse` hooks (`guard-remote-mutation.mjs`, `guard-main-checkout-edits.mjs`, and `guard-symlinked-node-modules.mjs`).
+If you also want the repo-level git hooks (`scripts/git-hooks/`), the documentation linters (`scripts/check-doc-links.mjs` and `scripts/reflow-docs.mjs`), and scaffolded [`CLAUDE.md`](CLAUDE.md) / [`docs/backlog.md`](docs/backlog.md) files committed inside your project, use **Option B**.
+
+### Option B: Bootstrap a Repository (Self-Contained in Git)
 
 Run via `npx` directly from GitHub or from a local clone:
 
@@ -36,9 +54,9 @@ Flags:
 - `--ui` — Also copy `templates/docs/design/mockup-scaffold.html` and `templates/driver-commands.example.mjs`.
 - `--force` — Overwrite existing files in the target repository.
 
-### Option B: Symlink Globally into `~/.claude/`
+### Option C: Clone & Symlink Globally into `~/.claude/`
 
-To make all seven skills and the `PreToolUse` hooks available across every project on your machine without committing them into each repo:
+To symlink all seven skills and the `PreToolUse` hooks directly into `~/.claude/` from a local clone:
 
 ```bash
 node /path/to/claude-toolkit/bin/claude-toolkit.mjs install-global

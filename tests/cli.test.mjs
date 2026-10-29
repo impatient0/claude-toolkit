@@ -130,3 +130,33 @@ test('installGlobal symlinks skills and hooks into target ~/.claude directory', 
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('native Claude Code plugin manifests use ./ plugin-root-relative paths and ${CLAUDE_PLUGIN_ROOT} hook commands', () => {
+  const repoRoot = path.resolve(import.meta.dirname, '..');
+  const pluginJson = JSON.parse(readFileSync(path.join(repoRoot, '.claude-plugin/plugin.json'), 'utf8'));
+  assert.equal(pluginJson.name, 'claude-toolkit');
+  assert.ok(pluginJson.skills.startsWith('./'), 'plugin.json skills path must start with ./');
+  assert.ok(!pluginJson.skills.includes('..'), 'plugin.json skills path must not use ..');
+  assert.ok(existsSync(path.join(repoRoot, pluginJson.skills, 'wrap-up/SKILL.md')));
+  assert.ok(pluginJson.hooks.startsWith('./'), 'plugin.json hooks path must start with ./');
+  assert.ok(existsSync(path.join(repoRoot, pluginJson.hooks)));
+
+  const marketplaceJson = JSON.parse(readFileSync(path.join(repoRoot, '.claude-plugin/marketplace.json'), 'utf8'));
+  assert.equal(marketplaceJson.name, 'claude-toolkit');
+  assert.equal(marketplaceJson.plugins[0].name, 'claude-toolkit');
+  assert.equal(marketplaceJson.plugins[0].source, './');
+
+  const hooksJson = JSON.parse(readFileSync(path.join(repoRoot, pluginJson.hooks), 'utf8'));
+  assert.ok(Array.isArray(hooksJson.hooks?.PreToolUse));
+  for (const group of hooksJson.hooks.PreToolUse) {
+    for (const h of group.hooks) {
+      assert.ok(
+        h.command.includes('${CLAUDE_PLUGIN_ROOT}/'),
+        `hook command must reference \${CLAUDE_PLUGIN_ROOT}: ${h.command}`
+      );
+      const rel = h.command.match(/\$\{CLAUDE_PLUGIN_ROOT\}\/([^"'\s]+)/)?.[1];
+      assert.ok(rel && existsSync(path.join(repoRoot, rel)), `hook script must exist: ${rel}`);
+    }
+  }
+});
+

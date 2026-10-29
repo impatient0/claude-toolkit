@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-toolkit",
+  "description": "Empirical Claude Code skills, mechanical PreToolUse and git guards, documentation graph linters, and a headless Playwright browser REPL.",
+  "owner": {
+    "name": "impatient0"
+  },
+  "plugins": [
+    {
+      "name": "claude-toolkit",
+      "description": "Empirical Claude Code skills, PreToolUse guards, documentation graph checkers, and Playwright browser REPL.",
+      "version": "0.1.0",
+      "author": {
+        "name": "impatient0"
+      },
+      "source": "./",
+      "category": "development"
+    }
+  ]
+}
