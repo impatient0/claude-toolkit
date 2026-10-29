@@ -2,7 +2,7 @@
   "name": "claude-toolkit",
   "version": "0.1.0",
   "description": "Portable Claude Code skills, mechanical PreToolUse/git guards, doc linters, and headless browser REPL.",
-  "private": true,
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -10,6 +10,25 @@
   "bin": {
     "claude-toolkit": "./bin/claude-toolkit.mjs"
   },
+  "files": [
+    "bin/",
+    "scripts/",
+    "templates/",
+    "docs/",
+    ".claude/",
+    ".claude-plugin/",
+    "CLAUDE.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "claude-code",
+    "agentic-coding",
+    "skills",
+    "hooks",
+    "worktrees",
+    "playwright"
+  ],
   "scripts": {
     "test": "node --test tests/*.test.mjs && npm run check:doc-links && npm run check:doc-format",
     "check:hooks": "node --test tests/guard-*.test.mjs tests/gitHooks.test.mjs",

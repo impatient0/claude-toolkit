@@ -1,0 +1,8 @@
+{
+  "name": "claude-toolkit",
+  "version": "0.1.0",
+  "description": "Empirical Claude Code skills, PreToolUse guards, documentation graph checkers, and Playwright browser REPL.",
+  "license": "MIT",
+  "skills": "../.claude/skills",
+  "hooks": "../.claude/settings.json"
+}
