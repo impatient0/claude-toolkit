@@ -1,7 +1,7 @@
 # claude-toolkit
 
 Portable Claude Code skills, mechanical `PreToolUse` and git guards, documentation linters, and a headless Playwright browser REPL.
-Extracted so any project can get the full workflow with one bootstrap command or global symlinks.
+Extracted so any project can get the full workflow with one bootstrap command or global symlinks — see [`docs/field-notes.md`](docs/field-notes.md) for the empirical measurements and incident post-mortems behind each rule.
 
 ## What's Inside
 
