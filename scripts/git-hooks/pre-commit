@@ -1,0 +1,61 @@
+#!/bin/sh
+# Refuses a commit made where no session should be working.
+#
+# The companion to .claude/hooks/guard-main-checkout-edits.mjs, which can only see
+# edits made through the Edit/Write tools. An edit written by a shell command —
+# sed -i, a heredoc, a script — reaches this instead, at commit time.
+#
+# Two refusals:
+#   1. A commit in the main checkout. Its git dir IS the common git dir; a linked
+#      worktree's points back at the main checkout, so they differ there.
+#   2. A commit on main outside a merge. Merging is the only thing that puts a
+#      session on main, and a conflicted merge concludes with `git commit`, so
+#      MERGE_HEAD is what tells the two apart.
+# A third check, at the bottom, runs the browser-driver click-target tests when a
+# commit stages click-target.mjs or click-target.test.mjs.
+#
+# Enabled per clone: git config core.hooksPath scripts/git-hooks
+
+git_dir=$(git rev-parse --git-dir) || exit 0
+common_dir=$(git rev-parse --git-common-dir) || exit 0
+git_dir=$(cd "$git_dir" 2>/dev/null && pwd -P) || exit 0
+common_dir=$(cd "$common_dir" 2>/dev/null && pwd -P) || exit 0
+
+if [ "$git_dir" = "$common_dir" ]; then
+  echo "pre-commit: refusing a commit in the main checkout." >&2
+  echo "  It stays parked on a detached HEAD; work happens in a worktree." >&2
+  echo "  See CLAUDE.md#version-control." >&2
+  exit 1
+fi
+
+branch=$(git symbolic-ref --short -q HEAD)
+if [ "$branch" = "main" ] && [ ! -f "$git_dir/MERGE_HEAD" ]; then
+  echo "pre-commit: refusing a commit directly on main." >&2
+  echo "  Commit on your own branch, then merge with the merge-to-main skill." >&2
+  echo "  (A conflicted merge's own commit is allowed — MERGE_HEAD is set then.)" >&2
+  exit 1
+fi
+
+if git diff --cached --name-only | grep -qE '^\.claude/skills/(browser-driver|run-patient)/click-target(\.test)?\.mjs$'; then
+  if ! ldconfig -p 2>/dev/null | grep -q 'libasound\.so\.2'; then
+    asound=/tmp/playwright-libasound
+    if [ -z "$(find "$asound" -name 'libasound.so.2' 2>/dev/null)" ]; then
+      mkdir -p "$asound" && (cd "$asound" && apt-get download libasound2t64 >/dev/null 2>&1 && dpkg -x libasound2t64*.deb .)
+    fi
+    asound_lib=$(find "$asound" -name 'libasound.so.2' -exec dirname {} \; 2>/dev/null | head -n 1)
+    [ -n "$asound_lib" ] && LD_LIBRARY_PATH="$asound_lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" && export LD_LIBRARY_PATH
+  fi
+  cd "$(git rev-parse --show-toplevel)" || exit 0
+  script_name="check:browser-driver"
+  if [ -f package.json ] && grep -q '"check:run-patient-driver"' package.json; then
+    script_name="check:run-patient-driver"
+  fi
+  if ! npm run --silent "$script_name" >&2; then
+    echo "pre-commit: refusing a commit that changes browser-driver click resolution while its tests fail." >&2
+    echo "  If the output above is a browser launch error rather than a test failure, see" >&2
+    echo "  Prerequisites and Setup in .claude/skills/browser-driver/SKILL.md." >&2
+    exit 1
+  fi
+fi
+
+exit 0

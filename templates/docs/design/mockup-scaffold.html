@@ -1,0 +1,151 @@
+<!doctype html>
+<!--
+  THE REVIEW-MOCKUP TEMPLATE. Copy this file to a scratch path, fill the slots,
+  and publish as an Artifact. Never edit a mockup in place here.
+
+  Key invariant:
+    - --chrome-* tokens style the review toolbar/notes outside .frame;
+    - App tokens inside .frame are copied fresh from your app's real stylesheet
+      at authoring time (never reconstructed from memory).
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mockup — Feature Name (rev 1)</title>
+  <style>
+    :root {
+      --chrome-bg: #111318;
+      --chrome-surface: #1a1d24;
+      --chrome-border: #2c313c;
+      --chrome-text: #e5e7eb;
+      --chrome-muted: #9ca3af;
+      --chrome-accent: #60a5fa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--chrome-bg);
+      color: var(--chrome-text);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--chrome-surface);
+      border-bottom: 1px solid var(--chrome-border);
+    }
+    .picker, .switch-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .chrome-btn {
+      background: transparent;
+      color: var(--chrome-muted);
+      border: 1px solid var(--chrome-border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .chrome-btn[aria-pressed="true"] {
+      color: var(--chrome-text);
+      border-color: var(--chrome-accent);
+      background: rgba(96, 165, 250, 0.14);
+    }
+    .stage {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+      padding: 24px;
+    }
+    /* .frame matches browser-driver's default 480x900 mobile viewport */
+    .frame {
+      width: 480px;
+      min-height: 900px;
+      border: 1px solid var(--chrome-border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--app-bg, #ffffff);
+      color: var(--app-fg, #111827);
+    }
+    .frame[data-theme="dark"] {
+      --app-bg: #0f172a;
+      --app-fg: #f8fafc;
+    }
+    .notes {
+      max-width: 420px;
+      background: var(--chrome-surface);
+      border: 1px solid var(--chrome-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    [data-screen] { display: none; padding: 20px; }
+    [data-screen].active { display: block; }
+  </style>
+</head>
+<body>
+  <header class="toolbar">
+    <strong>Mockup — Feature Name (rev 1)</strong>
+    <div class="picker" role="group" aria-label="Screen state">
+      <button class="chrome-btn" data-pick="default" aria-pressed="true">Default</button>
+      <button class="chrome-btn" data-pick="empty" aria-pressed="false">Empty</button>
+      <button class="chrome-btn" data-pick="error" aria-pressed="false">Error</button>
+    </div>
+    <div class="switch-group" role="group" aria-label="Theme">
+      <button class="chrome-btn" data-theme-btn="dark" aria-pressed="true">Dark</button>
+      <button class="chrome-btn" data-theme-btn="light" aria-pressed="false">Light</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="frame" id="frame" data-theme="dark">
+      <section data-screen="default" class="active">
+        <h2>Default state</h2>
+        <p>Copy real app CSS and markup into this frame.</p>
+      </section>
+      <section data-screen="empty">
+        <h2>Empty state</h2>
+      </section>
+      <section data-screen="error">
+        <h2>Error state</h2>
+      </section>
+    </div>
+
+    <aside class="notes">
+      <h3>What this mockup settles</h3>
+      <ul>
+        <li>List the states, layout decisions, and copy under review.</li>
+      </ul>
+    </aside>
+  </main>
+
+  <script>
+    const frame = document.getElementById('frame');
+    document.querySelectorAll('[data-pick]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-pick');
+        document.querySelectorAll('[data-pick]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        document.querySelectorAll('[data-screen]').forEach((s) => {
+          s.classList.toggle('active', s.getAttribute('data-screen') === target);
+        });
+      });
+    });
+    document.querySelectorAll('[data-theme-btn]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const theme = btn.getAttribute('data-theme-btn');
+        frame.setAttribute('data-theme', theme);
+        document.querySelectorAll('[data-theme-btn]').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      });
+    });
+  </script>
+</body>
+</html>

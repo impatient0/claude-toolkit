@@ -1,0 +1,40 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-remote-mutation.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Checking for remote state mutation..."
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-symlinked-node-modules.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Checking node_modules is not a shared symlink..."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-main-checkout-edits.mjs\"",
+            "timeout": 10,
+            "statusMessage": "Checking the edit is not in the main checkout..."
+          }
+        ]
+      }
+    ]
+  },
+  "worktree": {
+    "symlinkDirectories": [
+      "node_modules"
+    ],
+    "baseRef": "head"
+  }
+}
